@@ -1,12 +1,14 @@
 {
   "name": "status-checker",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "esbuild ./src/functions/**/*.ts --bundle --outdir=dist --target=node20 --platform=node"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.2"
+  }
 }
