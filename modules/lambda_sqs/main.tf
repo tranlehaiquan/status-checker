@@ -3,6 +3,11 @@ provider "aws" {
   region = var.region
 }
 
+provider "aws" {
+  alias  = "main_region"
+  region = var.main_region
+}
+
 resource "aws_lambda_function" "lambda_function" {
   function_name       = "lambda_check_status"
   handler             = "index.handler"
@@ -73,6 +78,7 @@ resource "aws_sns_topic_subscription" "sns_to_sqs" {
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.message_queue_region.arn
   raw_message_delivery = true
+  provider = aws.main_region
 }
 
 resource "aws_sqs_queue_policy" "sqs_policy" {

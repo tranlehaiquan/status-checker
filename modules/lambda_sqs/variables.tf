@@ -3,6 +3,10 @@ variable "region" {
   type = string
 }
 
+variable "main_region" {
+  type = string
+}
+
 variable "lambda_filename" {
   type = string
 }
