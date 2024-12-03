@@ -1,6 +1,5 @@
-import { pingToWebsite } from '../../libs/pingToWebsite';
-// this function will ping to the website target
-// and create new Record in the database { id: newRecord.id, checkStatus: ref.checkStatus, result: string }
+import { pingToWebsite } from '../../../libs/pingToWebsite';
+
 const handler = async (event: { url: string }, context) => {
   console.log("status-check called");
   console.log("event:", event);
