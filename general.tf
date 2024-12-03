@@ -16,11 +16,28 @@ data "archive_file" "lambda_function_payload_createCheckStatus" {
   output_path = "./zip/lambda_function_payload_createCheckStatus.zip"
 }
 
+resource "aws_iam_role" "lambda_api_rest_exec" {
+  name = "lambda_api_rest_exec_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+  provider = aws.ap_southeast_1
+}
+
 resource "aws_lambda_function" "lambda_create_check" {
   function_name    = "lambda_create_check"
   handler          = "index.handler"
   runtime          = "nodejs20.x"
-  role             = aws_iam_role.lambda_exec.arn
+  role             = aws_iam_role.lambda_api_rest_exec.arn
   filename         = "./zip/lambda_function_payload_createCheckStatus.zip"
   source_code_hash = data.archive_file.lambda_function_payload_createCheckStatus.output_base64sha256
   provider         = aws.ap_southeast_1
@@ -61,3 +78,8 @@ resource "aws_lambda_permission" "api_gateway_permission" {
   provider      = aws.ap_southeast_1
 }
 
+# SNS
+resource "aws_sns_topic" "check_status_topic" {
+  name = "check_status_topic"
+  provider = aws.ap_southeast_1
+}

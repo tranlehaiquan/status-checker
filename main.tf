@@ -1,45 +1,21 @@
-variable "aws_regions" {
-  type = string
-  default = "ap-southeast-1"
-}
-
-provider "aws" {
-  region = var.aws_regions
-}
-
 data "archive_file" "lambda_function_payload" {
   type        = "zip"
   source_dir  = "./dist/checkStatus"
   output_path = "./zip/lambda_function_payload.zip"
 }
 
-resource "aws_lambda_function" "lambda_function" {
-  function_name       = "lambda_check_status"
-  handler             = "index.handler"
-  runtime             = "nodejs20.x"
-  role                = aws_iam_role.lambda_exec.arn
-  filename            = "./zip/lambda_function_payload.zip"
-  source_code_hash    = data.archive_file.lambda_function_payload.output_base64sha256
+module "lambda_sqs_1" {
+  source = "./modules/lambda_sqs"
+  region = "ap-southeast-1"
+  lambda_filename = data.archive_file.lambda_function_payload.output_path
+  lambda_source_code_hash = data.archive_file.lambda_function_payload.output_base64sha256
+  sns_topic_arn = aws_sns_topic.check_status_topic.arn
 }
 
-resource "aws_iam_role" "lambda_exec" {
-  name = "lambda_exec_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_policy" {
-  role       = aws_iam_role.lambda_exec.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
+# module "lambda_sqs_2" {
+#   source = "./modules/lambda_sqs"
+#   region = "ap-southeast-2"
+#   lambda_filename = data.archive_file.lambda_function_payload.output_path
+#   lambda_source_code_hash = data.archive_file.lambda_function_payload.output_base64sha256
+#   sns_topic_arn = aws_sns_topic.check_status_topic.arn
+# }
