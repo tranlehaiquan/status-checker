@@ -39,14 +39,41 @@ resource "aws_iam_role" "lambda_api_rest_exec" {
   provider = aws.main_region
 }
 
+resource "aws_iam_policy" "lambda_publish_sns_policy" {
+  name        = "lambda_publish_sns_policy"
+  description = "IAM policy for Lambda to publish to SNS"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sns:Publish"
+        Resource = aws_sns_topic.check_status_topic.arn
+      }
+    ]
+  })
+  provider = aws.main_region
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_publish_sns_attachment" {
+  role       = aws_iam_role.lambda_api_rest_exec.name
+  policy_arn = aws_iam_policy.lambda_publish_sns_policy.arn
+  provider   = aws.main_region
+}
+
 resource "aws_lambda_function" "lambda_create_check" {
   function_name    = "lambda_create_check"
   handler          = "index.handler"
   runtime          = "nodejs20.x"
   role             = aws_iam_role.lambda_api_rest_exec.arn
-  filename         = "./zip/lambda_function_payload_createCheckStatus.zip"
+  filename         = data.archive_file.lambda_function_payload_createCheckStatus.output_path
   source_code_hash = data.archive_file.lambda_function_payload_createCheckStatus.output_base64sha256
   provider         = aws.main_region
+  environment {
+    variables = {
+      SNS_TOPIC_ARN = aws_sns_topic.check_status_topic.arn
+    }
+  }
 }
 
 resource "aws_lambda_function" "lambda_get_check" {
@@ -125,3 +152,5 @@ resource "aws_sns_topic" "check_status_topic" {
   name     = "check_status_topic"
   provider = aws.main_region
 }
+
+#

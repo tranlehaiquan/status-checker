@@ -7,3 +7,4 @@ terraform.tfstate.backup
 zip
 .DS_Store
 hashicorp
+.env
