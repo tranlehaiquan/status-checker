@@ -8,3 +8,4 @@ zip
 .DS_Store
 hashicorp
 .env
+env.json

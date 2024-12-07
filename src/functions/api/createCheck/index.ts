@@ -1,20 +1,19 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayEventRequestContext } from "aws-lambda";
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
+import { marshall } from "@aws-sdk/util-dynamodb";
+import { v4 as uuid } from "uuid";
+
+import getDynamoDBClient from "../../../libs/getDynamoDBClient";
+import getAWSCredential from "../../../libs/getAWSCredential";
+import { PutItemCommand } from "@aws-sdk/client-dynamodb";
+
 // this function using to create check status
 // create a record in the database
 // Push message { id: newRecord.id } to SNS
 // SNS -> publish -> SQS -> lambda -> createCheckStatusResult
 
 const getSNSClient = () => {
-  const isDev = process.env.NODE_ENV === "development";
-
-  const credentials = isDev
-    ? {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      }
-    : null;
-
+  const credentials = getAWSCredential();
   const snsClient = new SNSClient({
     credentials,
   });
@@ -24,20 +23,30 @@ const getSNSClient = () => {
 
 const handler = async (
   event: APIGatewayProxyEvent,
-  context: any
+  context: APIGatewayEventRequestContext
 ): Promise<APIGatewayProxyResult> => {
   console.log("event", event);
-  console.log("env", process.env);
+  console.log("event.body", event.body);
   console.log("context", context);
-
+  const dynamodbClient = getDynamoDBClient();
   const snsClient = getSNSClient();
   const message = new PublishCommand({
     Message: JSON.stringify({ url: "https://google.com.vn" }),
     TopicArn: process.env.SNS_TOPIC_ARN,
   });
 
+  const paramsDB = {
+    Item: marshall({
+      id: uuid(),
+      url: "https://google.com.vn",
+    }),
+    TableName: "JobCheck",
+  }
+
   try {
     await snsClient.send(message);
+    await dynamodbClient.send(new PutItemCommand(paramsDB));
+    
     return {
       statusCode: 200,
       body: JSON.stringify({

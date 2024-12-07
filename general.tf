@@ -46,8 +46,8 @@ resource "aws_iam_policy" "lambda_publish_sns_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "sns:Publish"
+        Effect   = "Allow"
+        Action   = "sns:Publish"
         Resource = aws_sns_topic.check_status_topic.arn
       }
     ]
@@ -108,6 +108,7 @@ resource "aws_api_gateway_integration" "integration_create_check" {
   http_method             = aws_api_gateway_method.method_create_check.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
+  passthrough_behavior    = "WHEN_NO_MATCH"
   uri                     = aws_lambda_function.lambda_create_check.invoke_arn
   provider                = aws.main_region
 }
@@ -121,9 +122,10 @@ resource "aws_api_gateway_method" "method_get_check" {
 
 resource "aws_api_gateway_integration" "integration_get_check" {
   rest_api_id             = aws_api_gateway_rest_api.gateway.id
-  resource_id             = aws_api_gateway_resource.check.id
+  resource_id             = aws_api_gateway_method.method_get_check.resource_id
   http_method             = aws_api_gateway_method.method_get_check.http_method
-  integration_http_method = "GET"
+  integration_http_method = "POST"
+  passthrough_behavior    = "WHEN_NO_MATCH"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_get_check.invoke_arn
   provider                = aws.main_region
@@ -153,4 +155,95 @@ resource "aws_sns_topic" "check_status_topic" {
   provider = aws.main_region
 }
 
-#
+# DynamoDB
+# JobCheck Table
+resource "aws_dynamodb_table" "job_check" {
+  name           = "JobCheck"
+  billing_mode   = "PAY_PER_REQUEST" # Use on-demand billing
+  hash_key       = "id" # Partition Key
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  tags = {
+    Application = "JobCheckService"
+  }
+}
+
+# JobCheckResponse Table
+resource "aws_dynamodb_table" "job_check_response" {
+  name           = "JobCheckResponse"
+  billing_mode   = "PAY_PER_REQUEST" # Use on-demand billing
+  hash_key       = "id" # Partition Key
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  attribute {
+    name = "JobCheckId"
+    type = "S"
+  }
+
+  # GSI for querying by JobCheckId
+  global_secondary_index {
+    name            = "JobCheckId-index"
+    hash_key        = "JobCheckId"
+    projection_type = "ALL"
+  }
+
+  tags = {
+    Application = "JobCheckService"
+  }
+}
+
+# create gateway stage
+# resource "aws_api_gateway_stage" "gateway_stage_dev" {
+#   stage_name    = "dev"
+#   rest_api_id   = aws_api_gateway_rest_api.gateway.id
+#   deployment_id = aws_api_gateway_deployment.deployment.id
+#   provider      = aws.main_region
+# }
+
+# # output invoke URL
+# output "gateway_invoke_url" {
+#   value = aws_api_gateway_stage.gateway_stage_dev.invoke_url
+# }
+
+# policy for lambda to access dynamodb
+resource "aws_iam_policy" "lambda_database" {
+  name = "lambda_database_policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem"
+        ]
+        Resource = [
+          aws_dynamodb_table.job_check.arn,
+          aws_dynamodb_table.job_check.arn,
+          "${aws_dynamodb_table.job_check.arn}/index/*",
+          aws_dynamodb_table.job_check_response.arn,
+          aws_dynamodb_table.job_check_response.arn,
+          "${aws_dynamodb_table.job_check_response.arn}/index/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "lambda_database_attachment" {
+  name       = "lambda_database_attachment"
+  roles      = [aws_iam_role.lambda_api_rest_exec.name]
+  policy_arn = aws_iam_policy.lambda_database.arn
+}

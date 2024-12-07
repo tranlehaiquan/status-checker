@@ -14,3 +14,24 @@ graph TD;
     E -- Create Check result --> Database
 
 ```
+
+
+```mermaid
+erDiagram
+    JobCheck {
+        string id
+        string url
+        string createdDate
+    }
+
+    JobCheckResponse {
+        string id
+        string JobCheckId
+        string status
+        int    statusCode
+        int    responseTime
+        string createdDate
+    }
+    
+    JobCheck ||--o{ JobCheckResponse : has
+```

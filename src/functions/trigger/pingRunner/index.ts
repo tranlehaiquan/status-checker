@@ -8,7 +8,6 @@ const handler = async (
       body: string;
     }[];
   },
-  context
 ) => {
   const Records = event.Records;
 
@@ -18,10 +17,11 @@ const handler = async (
     Records.map(async (record) => {
       const url = JSON.parse(record.body).url;
       const result = await pingToWebsite(url);
-      console.log("result:", result);
       results.push(result);
     })
   );
+
+  console.log("results", results);
 
   return {
     statusCode: 200,
