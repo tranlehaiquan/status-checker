@@ -16,6 +16,12 @@ data "archive_file" "lambda_function_payload_createCheckStatus" {
   output_path = "./zip/lambda_function_payload_createCheckStatus.zip"
 }
 
+data "archive_file" "lambda_function_payload_getCheckById" {
+  type        = "zip"
+  source_dir  = "./dist/api/getCheckById"
+  output_path = "./zip/lambda_function_payload_getCheckById.zip"
+}
+
 data "archive_file" "lambda_function_payload_getCheck" {
   type        = "zip"
   source_dir  = "./dist/api/getCheck"
@@ -199,19 +205,6 @@ resource "aws_dynamodb_table" "job_check_response" {
     Application = "JobCheckService"
   }
 }
-
-# create gateway stage
-# resource "aws_api_gateway_stage" "gateway_stage_dev" {
-#   stage_name    = "dev"
-#   rest_api_id   = aws_api_gateway_rest_api.gateway.id
-#   deployment_id = aws_api_gateway_deployment.deployment.id
-#   provider      = aws.main_region
-# }
-
-# # output invoke URL
-# output "gateway_invoke_url" {
-#   value = aws_api_gateway_stage.gateway_stage_dev.invoke_url
-# }
 
 # policy for lambda to access dynamodb
 resource "aws_iam_policy" "lambda_database" {
