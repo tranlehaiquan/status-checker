@@ -11,6 +11,7 @@ module "lambda_sqs_1" {
   lambda_source_code_hash = data.archive_file.lambda_function_trigger_check.output_base64sha256
   sns_topic_arn           = aws_sns_topic.check_status_topic.arn
   main_region             = var.main_region
+  policy_access_database_arn =  aws_iam_policy.lambda_database.arn
 }
 
 module "lambda_sqs_2" {
@@ -20,4 +21,5 @@ module "lambda_sqs_2" {
   lambda_source_code_hash = data.archive_file.lambda_function_trigger_check.output_base64sha256
   sns_topic_arn           = aws_sns_topic.check_status_topic.arn
   main_region             = var.main_region
+  policy_access_database_arn =  aws_iam_policy.lambda_database.arn
 }

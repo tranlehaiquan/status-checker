@@ -18,3 +18,7 @@ variable "lambda_source_code_hash" {
 variable "sns_topic_arn" {
   type = string
 }
+
+variable "policy_access_database_arn" {
+  type = string
+}

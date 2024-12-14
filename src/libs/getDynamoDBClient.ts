@@ -5,6 +5,7 @@ const getDynamoDBClient = () => {
   const credentials = getAWSCredential();
   const dynamoDBClient = new DynamoDBClient({
     credentials,
+    region: 'ap-southeast-1',
   });
 
   return dynamoDBClient;

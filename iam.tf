@@ -65,8 +65,8 @@ resource "aws_iam_policy" "lambda_database" {
   })
 }
 
-resource "aws_iam_policy_attachment" "lambda_database_attachment" {
-  name       = "lambda_database_attachment"
-  roles      = [aws_iam_role.lambda_api_rest_exec.name]
+resource "aws_iam_role_policy_attachment" "lambda_database_attachment" {
+  role       = aws_iam_role.lambda_api_rest_exec.name
   policy_arn = aws_iam_policy.lambda_database.arn
+  provider   = aws.main_region
 }

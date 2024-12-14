@@ -15,7 +15,6 @@ import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 // create a record in the database
 // Push message { id: newRecord.id } to SNS
 // SNS -> publish -> SQS -> lambda -> createCheckStatusResult
-
 const getSNSClient = () => {
   const credentials = getAWSCredential();
   const snsClient = new SNSClient({
@@ -29,25 +28,22 @@ const handler = async (
   event: APIGatewayProxyEvent,
   context: APIGatewayEventRequestContext
 ): Promise<APIGatewayProxyResult> => {
-  console.log("event", event);
-  console.log("context", context);
-
   const body = event.body;
-  console.log("body", typeof body, body);
   const url = JSON.parse(body).url;
 
   const dynamodbClient = getDynamoDBClient();
   const snsClient = getSNSClient();
+  const record = {
+    id: uuid(),
+    url,
+  };
   const message = new PublishCommand({
-    Message: JSON.stringify({ url }),
+    Message: JSON.stringify(record),
     TopicArn: process.env.SNS_TOPIC_ARN,
   });
 
   const paramsDB = {
-    Item: marshall({
-      id: uuid(),
-      url: "https://google.com.vn",
-    }),
+    Item: marshall(record),
     TableName: "JobCheck",
   };
 
@@ -57,12 +53,9 @@ const handler = async (
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        message: "create-check-status called",
-      }),
+      body: JSON.stringify(record),
     };
   } catch (error) {
-    console.error("error", error);
     return {
       statusCode: 500,
       body: JSON.stringify({

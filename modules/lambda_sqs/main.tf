@@ -39,6 +39,11 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_runner_database" {
+  role = aws_iam_role.lambda_exec.name
+  policy_arn = var.policy_access_database_arn
+}
+
 resource "aws_sqs_queue" "message_queue_region" {
   name = "message_queue_region_${var.region}"
 }
