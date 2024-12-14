@@ -74,3 +74,26 @@ resource "aws_api_gateway_integration" "integration_get_check_by_id" {
   uri                     = aws_lambda_function.lambda_get_check_by_id.invoke_arn
   provider                = aws.main_region
 }
+
+resource "aws_api_gateway_deployment" "deployment" {
+  rest_api_id = aws_api_gateway_rest_api.gateway.id
+  provider    = aws.main_region
+
+  depends_on = [
+    aws_api_gateway_integration.integration_create_check,
+    aws_api_gateway_integration.integration_get_check,
+    aws_api_gateway_integration.integration_get_check_by_id
+  ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "stage" {
+  deployment_id = aws_api_gateway_deployment.deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.gateway.id
+  stage_name    = "dev"
+  provider      = aws.main_region
+}
+
