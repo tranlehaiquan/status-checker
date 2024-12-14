@@ -1,21 +1,20 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyResult } from "aws-lambda";
 import getDynamoDBClient from "../../../libs/getDynamoDBClient";
-import { ScanCommand } from "@aws-sdk/client-dynamodb";
+import { ScanCommand, ScanCommandInput } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
-// GET /check/{id}
-const handler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
-  // log param id
-  console.log("get-check-status called");
-  console.log("event:", event);
+// GET /check
+const handler = async (): Promise<APIGatewayProxyResult> => {
   const dynamodbClient = getDynamoDBClient();
 
-  const params = {
-    ProjectionExpression: "id",
+  const params: ScanCommandInput = {
+    ProjectionExpression: "id, #url",
+    ExpressionAttributeNames: {
+      "#url": "url"
+    },
     TableName: "JobCheck",
   };
+
   const command = new ScanCommand(params);
   const data = await dynamodbClient.send(command);
   const items = data.Items.map(i => unmarshall(i));

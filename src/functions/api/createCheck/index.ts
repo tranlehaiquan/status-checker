@@ -1,4 +1,8 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayEventRequestContext } from "aws-lambda";
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  APIGatewayEventRequestContext,
+} from "aws-lambda";
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuid } from "uuid";
@@ -26,12 +30,16 @@ const handler = async (
   context: APIGatewayEventRequestContext
 ): Promise<APIGatewayProxyResult> => {
   console.log("event", event);
-  console.log("event.body", event.body);
   console.log("context", context);
+
+  const body = event.body;
+  console.log("body", typeof body, body);
+  const url = JSON.parse(body).url;
+
   const dynamodbClient = getDynamoDBClient();
   const snsClient = getSNSClient();
   const message = new PublishCommand({
-    Message: JSON.stringify({ url: "https://google.com.vn" }),
+    Message: JSON.stringify({ url }),
     TopicArn: process.env.SNS_TOPIC_ARN,
   });
 
@@ -41,12 +49,12 @@ const handler = async (
       url: "https://google.com.vn",
     }),
     TableName: "JobCheck",
-  }
+  };
 
   try {
     await snsClient.send(message);
     await dynamodbClient.send(new PutItemCommand(paramsDB));
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
