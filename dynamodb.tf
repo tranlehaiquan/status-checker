@@ -24,14 +24,14 @@ resource "aws_dynamodb_table" "job_check_response" {
   }
 
   attribute {
-    name = "JobCheckId"
+    name = "jobCheckId"
     type = "S"
   }
 
   # GSI for querying by JobCheckId
   global_secondary_index {
-    name            = "JobCheckId-index"
-    hash_key        = "JobCheckId"
+    name            = "jobCheckId-index"
+    hash_key        = "jobCheckId"
     projection_type = "ALL"
   }
 

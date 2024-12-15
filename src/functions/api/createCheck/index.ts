@@ -26,16 +26,15 @@ const getSNSClient = () => {
 
 const handler = async (
   event: APIGatewayProxyEvent,
-  context: APIGatewayEventRequestContext
 ): Promise<APIGatewayProxyResult> => {
   const body = event.body;
   const url = JSON.parse(body).url;
-
+  const urlInstance = new URL(url);
   const dynamodbClient = getDynamoDBClient();
   const snsClient = getSNSClient();
   const record = {
     id: uuid(),
-    url,
+    url: urlInstance.origin,
   };
   const message = new PublishCommand({
     Message: JSON.stringify(record),

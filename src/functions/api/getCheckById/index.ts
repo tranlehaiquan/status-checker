@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import getDynamoDBClient from "../../../libs/getDynamoDBClient";
-import { QueryCommand, ScanCommandInput } from "@aws-sdk/client-dynamodb";
+import { QueryCommand, QueryCommandInput } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 // GET /check/{id}
@@ -10,23 +10,41 @@ const handler = async (
   const id = event.pathParameters?.id;
   const dynamodbClient = getDynamoDBClient();
 
-  const params: ScanCommandInput = {
+  const params: QueryCommandInput = {
     ProjectionExpression: "id, #url",
     ExpressionAttributeNames: {
-      "#url": "url"
+      "#url": "url",
     },
     TableName: "JobCheck",
-    FilterExpression: "id = :id",
+    KeyConditionExpression: "id = :id", // Changed from FilterExpression
     ExpressionAttributeValues: {
       ":id": { S: id },
     },
   };
 
-  const command = new QueryCommand(params);
-  const data = await dynamodbClient.send(command);
-  const items = data.Items.map(i => unmarshall(i));
+  const paramsResults: QueryCommandInput = {
+    ProjectionExpression: "id, jobCheckId, #region, #status, responseTime",
+    ExpressionAttributeNames: {
+      "#region": "region",
+      "#status": "status",
+    },
+    TableName: "JobCheckResponse",
+    IndexName: "jobCheckId-index", // Add GSI name
+    KeyConditionExpression: "jobCheckId = :jobCheckId",
+    ExpressionAttributeValues: {
+      ":jobCheckId": { S: id },
+    },
+  };
 
-  if(items.length === 0) {
+  const command = new QueryCommand(params);
+  const [checkDetail, checkResults] = await Promise.all([
+    dynamodbClient.send(command),
+    dynamodbClient.send(new QueryCommand(paramsResults)),
+  ]);
+  const details = checkDetail.Items.map((i) => unmarshall(i));
+  const results = checkResults.Items.map((i) => unmarshall(i));
+
+  if (details.length === 0) {
     return {
       statusCode: 404,
       headers: {
@@ -36,12 +54,17 @@ const handler = async (
     };
   }
 
+  const detail = details[0];
+
   return {
     statusCode: 200,
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(items[0]),
+    body: JSON.stringify({
+      ...detail,
+      results,
+    }),
   };
 };
 
