@@ -2,7 +2,8 @@
   "name": "status-checker",
   "version": "1.0.0",
   "scripts": {
-    "build": "esbuild ./src/functions/**/*.ts --bundle --outdir=dist --target=node20 --platform=node"
+    "build": "esbuild ./src/functions/**/*.ts --bundle --outdir=dist --target=node20 --platform=node",
+    "front-end": "pnpm --filter front-end"
   },
   "keywords": [],
   "author": "",
