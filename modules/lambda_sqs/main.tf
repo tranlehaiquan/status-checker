@@ -15,6 +15,8 @@ resource "aws_lambda_function" "lambda_function" {
   role                = aws_iam_role.lambda_exec.arn
   filename            = var.lambda_filename
   source_code_hash    = var.lambda_source_code_hash
+
+  timeout = 15
 }
 
 resource "aws_iam_role" "lambda_exec" {
