@@ -1,12 +1,9 @@
 import "./App.css";
-import { Button } from "@/components/ui/button";
+import StatusCheck from "./features/statusCheck/StatusCheck";
 
 function App() {
   return (
-    <div>
-      {import.meta.env.VITE_BE_URL}
-      <Button>Click me</Button>
-    </div>
+    <StatusCheck />
   );
 }
 

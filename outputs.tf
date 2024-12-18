@@ -1,4 +1,4 @@
 output "api_endpoint" {
-  value = "${aws_api_gateway_stage.stage.invoke_url}"
+  value = "${aws_apigatewayv2_api.gateway.api_endpoint}"
   description = "The URL to invoke the API Gateway"
 }

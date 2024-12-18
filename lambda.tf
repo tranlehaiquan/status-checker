@@ -57,7 +57,7 @@ resource "aws_lambda_permission" "api_gateway_permission" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_create_check.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.gateway.execution_arn}/*/*"
   provider      = aws.main_region
 }
 
@@ -66,7 +66,7 @@ resource "aws_lambda_permission" "api_gateway_permission_get_check" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_get_check.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.gateway.execution_arn}/*/*"
   provider      = aws.main_region
 }
 
@@ -75,6 +75,6 @@ resource "aws_lambda_permission" "api_gateway_permission_get_check_by_id" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_get_check_by_id.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.gateway.execution_arn}/*/*"
   provider      = aws.main_region
 }
