@@ -1,0 +1,14 @@
+{
+  "name": "common",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild ./src/**/*.ts --bundle --outdir=dist --target=node20 --platform=node"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "esbuild": "^0.24.0"
+  }
+}

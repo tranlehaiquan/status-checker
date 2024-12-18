@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  apps/back-end:
     dependencies:
       '@aws-sdk/client-dynamodb':
         specifier: ^3.705.0
@@ -115,6 +117,15 @@ importers:
       vite:
         specifier: ^6.0.1
         version: 6.0.3(@types/node@22.10.1)(jiti@1.21.6)(yaml@2.6.1)
+
+  packages/common:
+    devDependencies:
+      esbuild:
+        specifier: ^0.24.0
+        version: 0.24.0
+      typescript:
+        specifier: ~5.6.2
+        version: 5.6.3
 
 packages:
 

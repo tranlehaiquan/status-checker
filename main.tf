@@ -1,6 +1,6 @@
 data "archive_file" "lambda_function_trigger_check" {
   type        = "zip"
-  source_dir  = "./dist/trigger/pingRunner"
+  source_dir  = "./apps/back-end/dist/trigger/pingRunner"
   output_path = "./zip/pingRunner.zip"
 }
 

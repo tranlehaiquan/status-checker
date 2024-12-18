@@ -1,18 +1,18 @@
 data "archive_file" "lambda_function_payload_createCheckStatus" {
   type        = "zip"
-  source_dir  = "./dist/api/createCheck"
+  source_dir  = "./apps/back-end/dist/api/createCheck"
   output_path = "./zip/lambda_function_payload_createCheckStatus.zip"
 }
 
 data "archive_file" "lambda_function_payload_getCheckById" {
   type        = "zip"
-  source_dir  = "./dist/api/getCheckById"
+  source_dir  = "./apps/back-end/dist/api/getCheckById"
   output_path = "./zip/lambda_function_payload_getCheckById.zip"
 }
 
 data "archive_file" "lambda_function_payload_getCheck" {
   type        = "zip"
-  source_dir  = "./dist/api/getCheck"
+  source_dir  = "./apps/back-end/dist/api/getCheck"
   output_path = "./zip/lambda_function_payload_getCheck.zip"
 }
 
