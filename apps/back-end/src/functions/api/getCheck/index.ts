@@ -8,7 +8,7 @@ const handler = async (): Promise<APIGatewayProxyResult> => {
   const dynamodbClient = getDynamoDBClient();
 
   const params: ScanCommandInput = {
-    ProjectionExpression: "id, #url",
+    ProjectionExpression: "id, #url, createdAt",
     ExpressionAttributeNames: {
       "#url": "url"
     },

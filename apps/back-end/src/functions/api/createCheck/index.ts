@@ -35,6 +35,7 @@ const handler = async (
   const record = {
     id: uuid(),
     url: urlInstance.origin,
+    createdAt: new Date().toISOString(),
   };
   const message = new PublishCommand({
     Message: JSON.stringify(record),

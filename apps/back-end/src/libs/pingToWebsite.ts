@@ -10,11 +10,16 @@ export const pingToWebsite = async (url: string, timeout: number = 10) => {
   // let null be the default value for status
   let status = null;
   let responseTime;
+  let ok = false;
 
   const start = Date.now();
   try {
-    const result = await promiseWithTimeout(fetch(url), timeout * 1000);
+    const result = (await promiseWithTimeout(
+      fetch(url),
+      timeout * 1000
+    )) as Response;
     status = result.status;
+    ok = result.ok;
   } catch (error) {
     if (error instanceof ErrorTimeout) {
       status = 408;
@@ -27,6 +32,7 @@ export const pingToWebsite = async (url: string, timeout: number = 10) => {
 
   return {
     status,
+    ok,
     responseTime,
   };
 };

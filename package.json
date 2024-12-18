@@ -4,7 +4,11 @@
   "scripts": {
     "front-end": "pnpm --filter front-end",
     "back-end": "pnpm --filter back-end",
-    "build:all": "pnpm run front-end build && pnpm run back-end build"
+    "build:be": "pnpm back-end build",
+    "build:fe": "pnpm front-end build",
+    "build:all": "pnpm build:be && pnpm build:fe",
+    "start-gateway": "sam local start-api --hook-name terraform",
+    "tf:apply": "pnpm build:all && terraform apply"
   },
   "keywords": [],
   "author": "",
