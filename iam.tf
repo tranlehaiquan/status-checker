@@ -70,3 +70,28 @@ resource "aws_iam_role_policy_attachment" "lambda_database_attachment" {
   policy_arn = aws_iam_policy.lambda_database.arn
   provider   = aws.main_region
 }
+
+resource "aws_iam_policy" "lambda_cloudwatch_logs" {
+  name = "lambda_cloudwatch_logs_policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+  provider = aws.main_region
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_logs_attachment" {
+  role       = aws_iam_role.lambda_api_rest_exec.name
+  policy_arn = aws_iam_policy.lambda_cloudwatch_logs.arn
+  provider   = aws.main_region
+}
