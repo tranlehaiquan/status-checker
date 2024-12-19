@@ -31,6 +31,7 @@ erDiagram
         int     responseTime
         string  createdAt
         boolean ok
+        string  region
     }
     
     JobCheck ||--o{ JobCheckResponse : has

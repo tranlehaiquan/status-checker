@@ -24,6 +24,7 @@ const handler = async (
         id: uuid(),
         jobCheckId: payload.id,
         region: process.env.AWS_REGION,
+        createAt: new Date().toISOString(),
         ...result,
       }
 
