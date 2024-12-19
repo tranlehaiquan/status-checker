@@ -26,7 +26,9 @@ const StatusCheck: React.FC<Props> = () => {
 
   return (
     <div>
-      <Button onClick={handleGoBack}>Go back</Button>
+      <Button onClick={handleGoBack} variant={"link"}>
+        &larr; Go back
+      </Button>
 
       <StatusCheckResults statusCheck={statusCheck} />
     </div>

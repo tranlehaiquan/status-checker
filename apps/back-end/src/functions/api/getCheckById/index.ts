@@ -23,7 +23,7 @@ const handler = async (
   };
 
   const paramsResults: QueryCommandInput = {
-    ProjectionExpression: "id, jobCheckId, #region, #status, responseTime",
+    ProjectionExpression: "id, jobCheckId, #region, #status, responseTime, ok",
     ExpressionAttributeNames: {
       "#region": "region",
       "#status": "status",

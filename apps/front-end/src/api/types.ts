@@ -18,5 +18,6 @@ export type StatusCheckResultRecord = {
     responseTime: number;
     id: string;
     status: number;
+    ok: boolean;
   }[];
 };
