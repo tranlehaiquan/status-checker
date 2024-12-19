@@ -7,3 +7,16 @@ export type StatusCheckRecord = {
   url: string;
   createdAt: string;
 };
+
+export type StatusCheckResultRecord = {
+  id: string;
+  url: string;
+
+  results: {
+    jobCheckId: string;
+    region: string;
+    responseTime: number;
+    id: string;
+    status: number;
+  }[];
+};

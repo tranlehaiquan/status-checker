@@ -1,4 +1,4 @@
-import { InsertStatusCheck } from "./types"
+import { InsertStatusCheck, StatusCheckResultRecord } from "./types"
 
 const BASE_URL = import.meta.env.VITE_BE_URL;
 
@@ -16,4 +16,7 @@ export const createStatusCheck = async (params: InsertStatusCheck) => {
 
 export const getAllStatusCheck = async () => {}
 
-export const getStatusCheckById = async (id: string) => {}
+export const getStatusCheckById = async (id: string): Promise<StatusCheckResultRecord> => {
+  const response = await fetch(`${BASE_URL}/check/${id}`);
+  return response.json();
+}
