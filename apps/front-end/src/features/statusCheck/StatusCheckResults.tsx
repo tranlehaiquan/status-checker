@@ -4,14 +4,19 @@ import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getStatusCheckById } from "@/api";
 import { Loader2 } from "lucide-react";
+import { AWS_REGIONS } from "@/lib/regions";
 
 interface Props {
   className?: string;
   statusCheck: StatusCheckRecord;
 }
 
-const TOTAL_REFETCH_TIME = 10000;
+const TOTAL_REFETCH_TIME = 20000;
 const REFETCH_INTERVAL = 2500;
+
+const getRegionName = (region: string) => {
+  return AWS_REGIONS.find((r) => r.code === region)?.name || region;
+}
 
 const StatusCheckResults: React.FC<Props> = ({ statusCheck, className }) => {
   const [refetch, setRefetch] = React.useState(true);
@@ -71,7 +76,7 @@ const StatusCheckResults: React.FC<Props> = ({ statusCheck, className }) => {
             )}
           >
             <div className="flex justify-between items-start mb-2">
-              <h3 className="font-semibold">{result.region}</h3>
+              <h3 className="font-semibold">{getRegionName(result.region)}</h3>
               <span className="font-medium">{result.status}</span>
             </div>
             <p className="text-sm opacity-75">

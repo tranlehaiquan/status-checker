@@ -21,16 +21,16 @@ erDiagram
     JobCheck {
         string id
         string url
-        string createdDate
+        string createdAt
     }
 
     JobCheckResponse {
-        string id
-        string JobCheckId
-        string status
-        int    statusCode
-        int    responseTime
-        string createdDate
+        string  id
+        string  JobCheckId
+        int     status
+        int     responseTime
+        string  createdAt
+        boolean ok
     }
     
     JobCheck ||--o{ JobCheckResponse : has
