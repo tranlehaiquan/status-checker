@@ -100,3 +100,20 @@ output "cloudfront_url" {
 output "s3_bucket_name" {
   value = aws_s3_bucket.website.id
 }
+
+resource "aws_s3_object" "static_website" {
+  for_each = fileset("./apps/front-end/dist", "**/*")
+  bucket = aws_s3_bucket.website.id
+  key = each.value
+  source = "./apps/front-end/dist/${each.value}"
+  etag = filemd5("./apps/front-end/dist/${each.value}")
+  content_type = lookup({
+    "html" = "text/html",
+    "css"  = "text/css",
+    "js"   = "application/javascript",
+    "png"  = "image/png",
+    "jpg"  = "image/jpeg",
+    "gif"  = "image/gif",
+    "svg"  = "image/svg+xml"
+  }, split(".", each.value)[length(split(".", each.value)) - 1], "application/octet-stream")
+}
